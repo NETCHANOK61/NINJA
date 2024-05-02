@@ -1,0 +1,155 @@
+[
+    {
+        "_id": 17146361840837986,
+        "camera_id": "กล้องทดสอบ-ขาเข้า-1",
+        "gender": {
+            "face_detected": false,
+            "gender": "unknown",
+            "age": "unknown"
+        },
+        "clothing": [],
+        "masked": false,
+        "glasses": false,
+        "create_at": "2024-05-02 14:49:44",
+        "pic_url": "192.168.8.153:9001/lpr-ai-picture/gender-aware/17146361840837986_result.jpg"
+    },
+    {
+        "_id": 17146361760838072,
+        "camera_id": "กล้องทดสอบ-ขาเข้า-1",
+        "gender": {
+            "face_detected": false,
+            "gender": "unknown",
+            "age": "unknown"
+        },
+        "clothing": [
+            {
+                "type": "เสื้อ",
+                "color": [
+                    {
+                        "value": "น้ำตาล",
+                        "acc": 46.34169884169884
+                    },
+                    {
+                        "value": "ขาว",
+                        "acc": 36.81467181467181
+                    }
+                ],
+                "conf": 0.2598615884780884
+            },
+            {
+                "type": "กางเกง",
+                "color": [
+                    {
+                        "value": "เทา",
+                        "acc": 62.93645630015181
+                    },
+                    {
+                        "value": "ขาว",
+                        "acc": 23.660811103882022
+                    }
+                ],
+                "conf": 0.3765104115009308
+            }
+        ],
+        "masked": false,
+        "glasses": false,
+        "create_at": "2024-05-02 14:49:36",
+        "pic_url": "192.168.8.153:9001/lpr-ai-picture/gender-aware/17146361760838072_result.jpg"
+    },
+    {
+        "_id": 17146361720973976,
+        "camera_id": "กล้องทดสอบ-ขาเข้า-1",
+        "gender": {
+            "face_detected": false,
+            "gender": "unknown",
+            "age": "unknown"
+        },
+        "clothing": [
+            {
+                "type": "กระเป๋า",
+                "color": [
+                    {
+                        "value": "ส้ม",
+                        "acc": 62.61316872427983
+                    },
+                    {
+                        "value": "น้ำตาล",
+                        "acc": 28.451646090534982
+                    }
+                ],
+                "conf": 0.5656571984291077
+            }
+        ],
+        "masked": false,
+        "glasses": false,
+        "create_at": "2024-05-02 14:49:32",
+        "pic_url": "192.168.8.153:9001/lpr-ai-picture/gender-aware/17146361720973976_result.jpg"
+    },
+    {
+        "_id": 17146361680872716,
+        "camera_id": "กล้องทดสอบ-ขาเข้า-1",
+        "gender": {
+            "face_detected": false,
+            "gender": "unknown",
+            "age": "unknown"
+        },
+        "clothing": [
+            {
+                "type": "รองเท้า",
+                "color": [
+                    {
+                        "value": "เทา",
+                        "acc": 52.95092838196287
+                    }
+                ],
+                "conf": 0.3624168038368225
+            },
+            {
+                "type": "รองเท้า",
+                "color": [
+                    {
+                        "value": "เทา",
+                        "acc": 43.84920634920635
+                    },
+                    {
+                        "value": "ขาว",
+                        "acc": 39.8313492063492
+                    }
+                ],
+                "conf": 0.5022851824760437
+            },
+            {
+                "type": "กระเป๋า",
+                "color": [
+                    {
+                        "value": "น้ำตาล",
+                        "acc": 62.14814814814815
+                    },
+                    {
+                        "value": "เหลือง",
+                        "acc": 22.444444444444443
+                    }
+                ],
+                "conf": 0.7265092730522156
+            },
+            {
+                "type": "กางเกง",
+                "color": [
+                    {
+                        "value": "เทา",
+                        "acc": 58.1841638445412
+                    },
+                    {
+                        "value": "ขาว",
+                        "acc": 34.83309143686502
+                    }
+                ],
+                "conf": 0.7404106259346008
+            }
+        ],
+        "masked": false,
+        "glasses": false,
+        "create_at": "2024-05-02 14:49:29",
+        "pic_url": "192.168.8.153:9001/lpr-ai-picture/gender-aware/17146361680872716_result.jpg"
+    }
+]

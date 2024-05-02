@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>LPR-NINJA</title>
+  <link rel="icon" href="./assets/external-ninja-cow-emoji-soft-fill-soft-fill-juicy-fish.png" alt="ninja-head"
+    type="image/x-icon">
+
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <link rel="stylesheet" href="./css/dataTable.css">
+  <script src="./js/sweetAlert.js"></script>
+  <script src="./js/moment.js"></script>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="car.html">
+      <img src="./assets/external-ninja-cow-emoji-soft-fill-soft-fill-juicy-fish.png" width="40" height="40"
+        class="d-inline-block align-top" alt="">
+    </a>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="index.html">ตั้งค่า <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="car.html">รถยนต์</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="motercycle.html">จักรยานยนต์</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div style="padding: 2%;">
+    <h3>URL ปัจจุบัน: <span id="storedURL"></span></h3>
+    <hr>
+    <form id="setting">
+      <div class="row">
+        <div class="col-8">
+          <div class="form-group">
+            <label for="Startdatetime">ระบุ URL:</label>
+            <input type="text" id="url_path" name="url_path" class="form-control" value="http://49.0.82.233">
+          </div>
+        </div>
+        <div class="col-2" style="align-content: center;">
+          <button type="submit" class="btn btn-info">บันทึก</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script src="./js/jquery-3.6.0.js"></script>
+  <script src="./js/poper.min.js"></script>
+  <script src="./js/dataTables.min.js"></script>
+
+  <script>
+    // Wait for the document to be fully loaded
+    document.addEventListener("DOMContentLoaded", function () {
+      // Get the form element
+      const form = document.getElementById("setting");
+
+      // Get the URL from localStorage
+      const storedURL = localStorage.getItem("storedURL");
+
+      // If a URL is found in localStorage, set it as the default value
+      if (storedURL) {
+        document.getElementById("url_path").value = storedURL;
+      }
+
+      document.getElementById('storedURL').innerText = storedURL;
+      console.log(storedURL);
+
+      // Add submit event listener to the form
+      form.addEventListener("submit", function (event) {
+        // Prevent the default form submission behavior
+        event.preventDefault();
+
+        // Get the value of the input field
+        const urlValue = document.getElementById("url_path").value;
+
+        // Store the URL to localStorage
+        localStorage.setItem("storedURL", urlValue);
+
+        // Optionally, you can provide feedback to the user that the URL has been stored.
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: "success",
+          title: "URL has been stored to localStorage.",
+          showConfirmButton: false,
+          timer: 3000
+        });
+        setTimeout(function () {
+          window.location.reload();
+        }, 3000);
+      });
+    });
+  </script>
+</body>
+
+</html>
