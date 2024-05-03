@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>LPR-NINJA</title>
+  <link rel="icon" href="./assets/external-ninja-cow-emoji-soft-fill-soft-fill-juicy-fish.png" alt="ninja-head"
+    type="image/x-icon">
+
+  <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> -->
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+  <!-- <link rel="stylesheet" href="./css/dataTable.css"> -->
+
+  <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
+  <script src="./js/sweetAlert.js"></script>
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script> -->
+  <script src="./js/moment.js"></script>
+
+</head>
+
+<body>
+  <!-- Image and text -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="car.html">
+      <img src="./assets/external-ninja-cow-emoji-soft-fill-soft-fill-juicy-fish.png" width="40" height="40"
+        class="d-inline-block align-top" alt="">
+    </a>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">ตั้งค่า</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="suspect.html">Suspect <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="object.html">Object</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div style="padding: 2%;">
+    <h3>CAMERA / license_plate : <b>รถยนต์</b></h3>
+    <hr>
+    <form id="myForm">
+      <div class="row">
+        <div class="col-5">
+          <div class="form-group">
+            <label for="Startdatetime">วันเริ่มต้น:</label>
+            <input type="datetime-local" id="sdatetime" name="sdatetime" class="form-control">
+          </div>
+        </div>
+        <div class="col-5">
+          <div class="form-group">
+            <label for="Enddatetime">วันสิ้นสุด:</label>
+            <input type="datetime-local" id="edatetime" name="edatetime" class="form-control">
+          </div>
+        </div>
+        <div class="col-5">
+          <div class="form-group">
+            <label for="CameraSelect">กล้อง:</label>
+            <select class="form-control" id="camera_id">
+              <option value="0">ทั้งหมด</option>
+              <option value="กล้องทดสอบ-ขาเข้า-1">กล้องทดสอบ-ขาเข้า-1</option>
+              <option value="กล้องทดสอบ-ขาเข้า-2">กล้องทดสอบ-ขาเข้า-2</option>
+              <option value="กล้องทดสอบ-ขาออก-1">กล้องทดสอบ-ขาออก-1</option>
+              <option value="กล้องทดสอบ-ขาออก-2">กล้องทดสอบ-ขาออก-2</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-2" style="align-content: center;">
+          <button type="submit" class="btn btn-info">ค้นหา</button>
+          <button type="button" class="btn btn-warning" onclick="clearAll()">เคลียร์</button>
+        </div>
+      </div>
+    </form>
+    <hr>
+    <button id="bulk-delete-1" class="btn btn-danger mb-3">ลบข้อมูลที่เลือก</button>
+    <table id="example" class="display table-bordered text-center" style="width:100%">
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="select-all" /></th>
+          <th>รูป</th>
+          <th>ข้อมูล</th>
+          <th>เพศ-อายุ</th>
+          <th style="background-color: #FFEEFC;">เพศ</th>
+          <th style="background-color: #FFEEFC;">อายุ/ช่วงวัย</th>
+          <!--  <th style="background-color: #FFEEFC;">ประเภท</th>
+          <th>รูป</th>
+          <th>ป้ายทะเบียน(%)</th>
+          <th style="background-color: #FFEEFC;">ป้ายทะเบียน</th>
+          <th style="background-color: #FFEEFC;">จังหวัด</th>
+          <th>รูป</th>
+          <th>ยี่ห้อ(%)</th>
+          <th style="background-color: #FFEEFC;">ยี่ห้อ</th>
+          <th>กระทำ</th> -->
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Table body will be populated dynamically -->
+      </tbody>
+    </table>
+    <button id="bulk-delete-2" class="btn btn-danger mb-3">ลบข้อมูลที่เลือก</button>
+  </div>
+
+  <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+  <script src="./js/jquery-3.6.0.js"></script>
+
+  <!-- <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script> -->
+  <script src="./js/poper.min.js"></script>
+
+  <!-- <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script> -->
+  <script src="./js/dataTables.min.js"></script>
+
+  <script>
+
+    // var baseUrl = 'http://49.0.82.233'; 
+    var baseUrl = 'http://192.168.1.112';
+    baseUrl = localStorage.getItem("storedURL") ? localStorage.getItem("storedURL") : baseUrl;
+    var vehicle_type = 'จักรยานยนต์';
+    var url_get = baseUrl + ':8000/last_10_log_data/?vehicle_type=' + vehicle_type;
+    var url_update = baseUrl + ':8002/licensplate/';
+    var url_cameras_all = baseUrl + ':8002/cameras/all'
+
+    // Check local storage for previously selected dates
+    var startDate = localStorage.getItem('startDate');
+    var endDate = localStorage.getItem('endDate');
+    baseUrl = localStorage.getItem("storedURL") ? localStorage.getItem("storedURL") : baseUrl;
+
+    $(document).ready(function () {
+
+      console.log(baseUrl);
+
+      // If dates are not found in local storage, set default values (now and now - 1 hour)
+      if (!startDate || !endDate) {
+        var now = new Date();
+
+        // Adjust time by subtracting 1 hour in Thai time zone
+        var th_now = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Bangkok' }));
+        var th_time_prev = new Date(th_now);
+        th_time_prev.setHours(th_time_prev.getHours() - 1);
+
+        // Format the date part
+        var year = th_now.getFullYear();
+        var month = String(th_now.getMonth() + 1).padStart(2, '0');
+        var day = String(th_now.getDate()).padStart(2, '0');
+
+        // Format time to display in Thai locale
+        var formattedTime = th_now.toLocaleTimeString('en-US', { hour12: false });
+        var formattedTime_prev = th_time_prev.toLocaleTimeString('en-US', { hour12: false });
+
+        // Concatenate date and time for startDate
+        endDate = `${year}-${month}-${day}T${formattedTime}`;
+
+        // Concatenate date and time for endDate
+        startDate = `${year}-${month}-${day}T${formattedTime_prev}`;
+      }
+
+      // Set the default values in the date inputs
+      $('#sdatetime').val(startDate.slice(0, 16)); // Truncate milliseconds
+      $('#edatetime').val(endDate.slice(0, 16)); // Truncate milliseconds
+
+      fetchData(startDate, endDate)
+
+      $('#myForm').submit(function (event) {
+        event.preventDefault(); // Prevent the form from submitting normally
+
+        startDate = $('#sdatetime').val();
+        endDate = $('#edatetime').val();
+        localStorage.setItem('startDate', startDate);
+        localStorage.setItem('endDate', endDate);
+
+        $('#sdatetime').val(startDate.slice(0, 16)); // Truncate milliseconds
+        $('#edatetime').val(endDate.slice(0, 16)); // Truncate milliseconds
+
+        fetchData(startDate, endDate,)
+      });
+    });
+
+    function fetchData(s, e) {
+      $('#example tbody').empty();
+      var camera_id = document.getElementById('camera_id').value;
+      // Format the start time and end time strings
+      let formattedStartTime = encodeURIComponent(s) + '%3A00';
+      let formattedEndTime = encodeURIComponent(e) + '%3A00';
+
+      var url_ = ''
+      if (camera_id != 0) {
+        url_ = url_get + '&start_time=' + formattedStartTime + '&end_time=' + formattedEndTime + '&camera_id=' + (camera_id).trim()
+      } else {
+        url_ = url_get + '&start_time=' + formattedStartTime + '&end_time=' + formattedEndTime;
+      }
+
+      const dumpData = [
+        {
+          "_id": 17146361840837986,
+          "camera_id": "กล้องทดสอบ-ขาเข้า-1",
+          "gender": {
+            "face_detected": false,
+            "gender": "unknown",
+            "age": "unknown"
+          },
+          "clothing": [],
+          "masked": false,
+          "glasses": false,
+          "create_at": "2024-05-02 14:49:44",
+          "pic_url": "192.168.8.153:9001/lpr-ai-picture/gender-aware/17146361840837986_result.jpg"
+        },
+        {
+          "_id": 17146361760838072,
+          "camera_id": "กล้องทดสอบ-ขาเข้า-1",
+          "gender": {
+            "face_detected": false,
+            "gender": "unknown",
+            "age": "unknown"
+          },
+          "clothing": [
+            {
+              "type": "เสื้อ",
+              "color": [
+                {
+                  "value": "น้ำตาล",
+                  "acc": 46.34169884169884
+                },
+                {
+                  "value": "ขาว",
+                  "acc": 36.81467181467181
+                }
+              ],
+              "conf": 0.2598615884780884
+            },
+            {
+              "type": "กางเกง",
+              "color": [
+                {
+                  "value": "เทา",
+                  "acc": 62.93645630015181
+                },
+                {
+                  "value": "ขาว",
+                  "acc": 23.660811103882022
+                }
+              ],
+              "conf": 0.3765104115009308
+            }
+          ],
+          "masked": false,
+          "glasses": false,
+          "create_at": "2024-05-02 14:49:36",
+          "pic_url": "192.168.8.153:9001/lpr-ai-picture/gender-aware/17146361760838072_result.jpg"
+        },
+        {
+          "_id": 17146361720973976,
+          "camera_id": "กล้องทดสอบ-ขาเข้า-1",
+          "gender": {
+            "face_detected": false,
+            "gender": "unknown",
+            "age": "unknown"
+          },
+          "clothing": [
+            {
+              "type": "กระเป๋า",
+              "color": [
+                {
+                  "value": "ส้ม",
+                  "acc": 62.61316872427983
+                },
+                {
+                  "value": "น้ำตาล",
+                  "acc": 28.451646090534982
+                }
+              ],
+              "conf": 0.5656571984291077
+            }
+          ],
+          "masked": false,
+          "glasses": false,
+          "create_at": "2024-05-02 14:49:32",
+          "pic_url": "192.168.8.153:9001/lpr-ai-picture/gender-aware/17146361720973976_result.jpg"
+        },
+        {
+          "_id": 17146361680872716,
+          "camera_id": "กล้องทดสอบ-ขาเข้า-1",
+          "gender": {
+            "face_detected": false,
+            "gender": "unknown",
+            "age": "unknown"
+          },
+          "clothing": [
+            {
+              "type": "รองเท้า",
+              "color": [
+                {
+                  "value": "เทา",
+                  "acc": 52.95092838196287
+                }
+              ],
+              "conf": 0.3624168038368225
+            },
+            {
+              "type": "รองเท้า",
+              "color": [
+                {
+                  "value": "เทา",
+                  "acc": 43.84920634920635
+                },
+                {
+                  "value": "ขาว",
+                  "acc": 39.8313492063492
+                }
+              ],
+              "conf": 0.5022851824760437
+            },
+            {
+              "type": "กระเป๋า",
+              "color": [
+                {
+                  "value": "น้ำตาล",
+                  "acc": 62.14814814814815
+                },
+                {
+                  "value": "เหลือง",
+                  "acc": 22.444444444444443
+                }
+              ],
+              "conf": 0.7265092730522156
+            },
+            {
+              "type": "กางเกง",
+              "color": [
+                {
+                  "value": "เทา",
+                  "acc": 58.1841638445412
+                },
+                {
+                  "value": "ขาว",
+                  "acc": 34.83309143686502
+                }
+              ],
+              "conf": 0.7404106259346008
+            }
+          ],
+          "masked": false,
+          "glasses": false,
+          "create_at": "2024-05-02 14:49:29",
+          "pic_url": "192.168.8.153:9001/lpr-ai-picture/gender-aware/17146361680872716_result.jpg"
+        }
+      ]
+      dumpData.forEach(function (item) {
+        console.log(item)
+        var formattedDate = moment(item.create_at).format('YYYY-MM-DD HH:mm:ss');
+
+        $('#example tbody').append('<tr>' +
+          '<td><input type="checkbox" class="delete-checkbox" value="' + item._id + '"></td>' +
+          '<td><img src=http://' + item.pic_url + '"></td>' +
+          '<td>' + item._id + '<br>' + formattedDate + '<br><b>' + item.camera_id + '</b></td>' +
+          '<td>' + 'เพศ: ' + '<b>' + item.gender.gender + '</b>' + '<br>' + 'อายุ: ' + '<b>' + item.gender.age + '</b>' + '</td>' +
+          '<td style="background-color: #FFEEFC;">' +
+          '<select class="form-control">' +
+          '<option value="unknown">Unknow</option>' +
+          '<option value="Female">หญิง</option>' +
+          '<option value="Male">ชาย</option>' +
+          '</select></td>' +
+          '</tr>');
+      });
+
+      // $.ajax({
+      //   url: url_,
+      //   method: 'GET',
+      //   success: function (data) {
+      //     const dumpData = [
+      //       {
+      //         "_id": 17146361840837986,
+      //         "camera_id": "กล้องทดสอบ-ขาเข้า-1",
+      //         "gender": {
+      //           "face_detected": false,
+      //           "gender": "unknown",
+      //           "age": "unknown"
+      //         },
+      //         "clothing": [],
+      //         "masked": false,
+      //         "glasses": false,
+      //         "create_at": "2024-05-02 14:49:44",
+      //         "pic_url": "192.168.8.153:9001/lpr-ai-picture/gender-aware/17146361840837986_result.jpg"
+      //       },
+      //       {
+      //         "_id": 17146361760838072,
+      //         "camera_id": "กล้องทดสอบ-ขาเข้า-1",
+      //         "gender": {
+      //           "face_detected": false,
+      //           "gender": "unknown",
+      //           "age": "unknown"
+      //         },
+      //         "clothing": [
+      //           {
+      //             "type": "เสื้อ",
+      //             "color": [
+      //               {
+      //                 "value": "น้ำตาล",
+      //                 "acc": 46.34169884169884
+      //               },
+      //               {
+      //                 "value": "ขาว",
+      //                 "acc": 36.81467181467181
+      //               }
+      //             ],
+      //             "conf": 0.2598615884780884
+      //           },
+      //           {
+      //             "type": "กางเกง",
+      //             "color": [
+      //               {
+      //                 "value": "เทา",
+      //                 "acc": 62.93645630015181
+      //               },
+      //               {
+      //                 "value": "ขาว",
+      //                 "acc": 23.660811103882022
+      //               }
+      //             ],
+      //             "conf": 0.3765104115009308
+      //           }
+      //         ],
+      //         "masked": false,
+      //         "glasses": false,
+      //         "create_at": "2024-05-02 14:49:36",
+      //         "pic_url": "192.168.8.153:9001/lpr-ai-picture/gender-aware/17146361760838072_result.jpg"
+      //       },
+      //       {
+      //         "_id": 17146361720973976,
+      //         "camera_id": "กล้องทดสอบ-ขาเข้า-1",
+      //         "gender": {
+      //           "face_detected": false,
+      //           "gender": "unknown",
+      //           "age": "unknown"
+      //         },
+      //         "clothing": [
+      //           {
+      //             "type": "กระเป๋า",
+      //             "color": [
+      //               {
+      //                 "value": "ส้ม",
+      //                 "acc": 62.61316872427983
+      //               },
+      //               {
+      //                 "value": "น้ำตาล",
+      //                 "acc": 28.451646090534982
+      //               }
+      //             ],
+      //             "conf": 0.5656571984291077
+      //           }
+      //         ],
+      //         "masked": false,
+      //         "glasses": false,
+      //         "create_at": "2024-05-02 14:49:32",
+      //         "pic_url": "192.168.8.153:9001/lpr-ai-picture/gender-aware/17146361720973976_result.jpg"
+      //       },
+      //       {
+      //         "_id": 17146361680872716,
+      //         "camera_id": "กล้องทดสอบ-ขาเข้า-1",
+      //         "gender": {
+      //           "face_detected": false,
+      //           "gender": "unknown",
+      //           "age": "unknown"
+      //         },
+      //         "clothing": [
+      //           {
+      //             "type": "รองเท้า",
+      //             "color": [
+      //               {
+      //                 "value": "เทา",
+      //                 "acc": 52.95092838196287
+      //               }
+      //             ],
+      //             "conf": 0.3624168038368225
+      //           },
+      //           {
+      //             "type": "รองเท้า",
+      //             "color": [
+      //               {
+      //                 "value": "เทา",
+      //                 "acc": 43.84920634920635
+      //               },
+      //               {
+      //                 "value": "ขาว",
+      //                 "acc": 39.8313492063492
+      //               }
+      //             ],
+      //             "conf": 0.5022851824760437
+      //           },
+      //           {
+      //             "type": "กระเป๋า",
+      //             "color": [
+      //               {
+      //                 "value": "น้ำตาล",
+      //                 "acc": 62.14814814814815
+      //               },
+      //               {
+      //                 "value": "เหลือง",
+      //                 "acc": 22.444444444444443
+      //               }
+      //             ],
+      //             "conf": 0.7265092730522156
+      //           },
+      //           {
+      //             "type": "กางเกง",
+      //             "color": [
+      //               {
+      //                 "value": "เทา",
+      //                 "acc": 58.1841638445412
+      //               },
+      //               {
+      //                 "value": "ขาว",
+      //                 "acc": 34.83309143686502
+      //               }
+      //             ],
+      //             "conf": 0.7404106259346008
+      //           }
+      //         ],
+      //         "masked": false,
+      //         "glasses": false,
+      //         "create_at": "2024-05-02 14:49:29",
+      //         "pic_url": "192.168.8.153:9001/lpr-ai-picture/gender-aware/17146361680872716_result.jpg"
+      //       }
+      //     ]
+      //     dumpData.forEach(function (item) {
+      //       console.log(item)
+      //       // var formattedDate = moment(item.create_at).format('YYYY-MM-DD HH:mm:ss');
+      //       // var candidatePlate = '';
+      //       // var candidateBrand = '';
+
+      //       // // Loop through item.candidates array to create HTML for each candidate
+      //       // item.candidates.slice(0, 4).forEach(function (candidate) {
+      //       //   candidatePlate += '<span>' + candidate.plate + '<span style="font-size:12px">(' + (candidate.score * 100).toFixed(1) + ')</span>' + '</span><br>';
+      //       // });
+
+      //       // item.vehicle_brand.slice(0, 4).forEach(function (candidate) {
+      //       //   candidateBrand += '<span>' + candidate.make + '<span style="font-size:12px">(' + (candidate.score * 100).toFixed(1) + ')</span>' + '</span><br>';
+      //       // });
+
+      //       $('#example tbody').append('<tr>' +
+      //         '<td><input type="checkbox" class="delete-checkbox" value="' + item._id + '"></td>' +
+      //         '<td>' + item._id + '<br>' + formattedDate + '<br><b>' + item.camera_id + '</b></td><td>' + item.vehicle_type + '</td>' +
+      //         '<td style="background-color: #FFEEFC;"><select class="form-control vehicle-type">' +
+      //         '<option value="Car">Car</option>' +
+      //         '<option value="Truck">Truck</option>' +
+      //         '<option value="Van">Van</option>' +
+      //         '<option value="SUV">SUV</option>' +
+      //         '</select></td>' +
+      //         '</tr>');
+      //     });
+
+      //     // $('#example tbody').on('click', '.zoom-image', function () {
+      //     //   openImageModal($(this).attr('src'));
+      //     // });
+
+      //     // Update functionality
+      //     // $('#example tbody').on('click', '.btn-update', function () {
+      //     //   var rowData = $(this).closest('tr');
+      //     //   var rowIndex = rowData.index();
+      //     //   var editedPlateNumber = rowData.find('.plate-number').text();
+      //     //   var editedVehicleType = rowData.find('.vehicle-type').text();
+      //     //   var editedPlateState = rowData.find('.plate-state').text();
+      //     //   var editedVehicleBrand = rowData.find('.plate-brand').text();
+      //     //   data[rowIndex].plate_number = editedPlateNumber;
+      //     //   data[rowIndex].candidates[0].plate = editedPlateNumber;
+      //     //   data[rowIndex].vehicle_brand[0].make = editedVehicleBrand;
+      //     //   data[rowIndex].plate_state.name = editedPlateState;
+      //     //   data[rowIndex].vehicle_type = editedVehicleType;
+      //     //   var dataUpdate = {
+      //     //     "plate_state": data[rowIndex].plate_state,
+      //     //     "plate_number": data[rowIndex].plate_number,
+      //     //     "candidates": data[rowIndex].candidates,
+      //     //     "vehicle_brand": data[rowIndex].vehicle_brand,
+      //     //     "vehicle_type": data[rowIndex].vehicle_type
+      //     //   };
+
+      //     //   // console.log(url_update + data[rowIndex]._id);
+      //     //   // console.log(dataUpdate);
+      //     //   // return
+
+      //     //   // Send updated data to the API
+      //     //   $.ajax({
+      //     //     url: url_update + data[rowIndex]._id, // Replace with the actual URL of your API
+      //     //     method: 'PUT', // Use the appropriate HTTP method (PUT, POST, etc.)
+      //     //     contentType: 'application/json',
+      //     //     data: JSON.stringify(dataUpdate),
+      //     //     success: function (response) {
+      //     //       showToast("Data updated successfully", "success");
+      //     //       // setTimeout(function () {
+      //     //       //   window.location.reload();
+      //     //       // }, 1000);
+      //     //     },
+      //     //     error: function (error) {
+      //     //       showToast("ไม่พบข้อมูล หรืออินเทอร์เน็ตมีปัญหา", "error");
+      //     //       // setTimeout(function () {
+      //     //       //   window.location.reload();
+      //     //       // }, 1000);
+      //     //       // console.error('Error updating data:', error);
+      //     //     }
+      //     //   });
+      //     // });
+      //   },
+      //   error: function (error) {
+      //     showToast("ไม่พบข้อมูล หรืออินเทอร์เน็ตมีปัญหา", "error");
+      //     // console.error('Error fetching data:', error);
+      //   }
+      // });
+    }
+
+    function openImageModal(imageUrl) {
+      Swal.fire({
+        imageUrl: imageUrl,
+        imageAlt: 'Plate Image',
+        showCloseButton: true,
+        showConfirmButton: false,
+        imageWidth: 400,
+        imageHeight: 300,
+        customClass: {
+          image: 'image-zoom',
+        },
+        html: '<div class="zoom-controls">' +
+          '<button class="zoom-btn zoom-in">Zoom In</button>' +
+          '<button class="zoom-btn zoom-out">Zoom Out</button>' +
+          '</div>',
+        didOpen: () => {
+          $('.swal2-image').css('max-width', '100%');
+        }
+      });
+
+      $('.zoom-in').click(function () {
+        $('.swal2-image').css('transform', 'scale(1.2)');
+      });
+
+      $('.zoom-out').click(function () {
+        $('.swal2-image').css('transform', 'scale(1)');
+      });
+    }
+
+    function showToast(message, type) {
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: type,
+        title: message,
+        showConfirmButton: false,
+        timer: 3000
+      });
+    }
+
+    $('#select-all').click(function () {
+      var checkedStatus = this.checked;
+      $('.delete-checkbox').each(function () {
+        $(this).prop('checked', checkedStatus);
+      });
+    });
+
+    $('#bulk-delete-1').click(function () {
+      var selectedIds = $('.delete-checkbox:checked').map(function () {
+        return $(this).val();
+      }).get();
+      del(selectedIds);
+    });
+
+    $('#bulk-delete-2').click(function () {
+      var selectedIds = $('.delete-checkbox:checked').map(function () {
+        return $(this).val();
+      }).get();
+      del(selectedIds);
+    });
+
+    function del(select) {
+      if (select.length > 0) {
+        // Loop through each selected ID
+        select.forEach(function (id) {
+          // Confirm before deletion
+          $.ajax({
+            url: url_update + id, // Use each item's _id in the request
+            method: 'DELETE',
+            contentType: 'application/json',
+            success: function (response) {
+              showToast("Data deleted successfully", "success");
+              // Consider keeping track of completed requests to only reload once all have finished
+            },
+            error: function (error) {
+              showToast("Error deleting data", "error");
+              console.error('Error deleting data:', error);
+            },
+            complete: function () {
+              // Check if all deletions have been processed before reloading
+              if (--select.length === 0) { // Decrement count and check if all requests completed
+                // setTimeout(function () {
+                //   window.location.reload();
+                // }, 1000);
+              }
+            }
+          });
+        });
+      } else {
+        showToast("No items selected", "error");
+      }
+    }
+
+    function clearAll() {
+      localStorage.clear();
+      document.getElementById('sdatetime').value = ''; // Replace 'datetime_input_id' with the actual ID of your datetime input element
+      document.getElementById('edatetime').value = ''; // Replace 'datetime_input_id' with the actual ID of your datetime input element
+    }
+  </script>
+
+</body>
+
+</html>

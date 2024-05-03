@@ -36,17 +36,17 @@
         <li class="nav-item">
           <a class="nav-link" href="index.html">ตั้งค่า</a>
         </li>
-        <li class="nav-item active">
-          <a class="nav-link" href="car.html">รถยนต์</a>
-        </li>
         <li class="nav-item">
-          <a class="nav-link" href="motercycle.html">จักรยานยนต์ <span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="suspect.html">Suspect</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="object.html">Object <span class="sr-only">(current)</span></a>
         </li>
       </ul>
     </div>
   </nav>
   <div style="padding: 2%;">
-    <h3>CAMERA / license_plate : <b>รถยนต์</b></h3>
+    <h3>CAMERA / restrict-target</h3>
     <hr>
     <form id="myForm">
       <div class="row">
@@ -87,8 +87,10 @@
         <tr>
           <th><input type="checkbox" id="select-all" /></th>
           <th>ข้อมูล</th>
-          <th>ประเภท</th>
-          <th style="background-color: #FFEEFC;">ประเภท</th>
+          <th>รูป</th>
+          <th style="background-color: #FFEEFC;">ข้อมูลวัตถุ</th>
+          <th style="background-color: #FFEEFC;">การกระทำ</th>
+          <!--  <th style="background-color: #FFEEFC;">ประเภท</th>
           <th>รูป</th>
           <th>ป้ายทะเบียน(%)</th>
           <th style="background-color: #FFEEFC;">ป้ายทะเบียน</th>
@@ -96,7 +98,7 @@
           <th>รูป</th>
           <th>ยี่ห้อ(%)</th>
           <th style="background-color: #FFEEFC;">ยี่ห้อ</th>
-          <th>กระทำ</th>
+          <th>กระทำ</th> -->
         </tr>
       </thead>
       <tbody>
@@ -134,7 +136,7 @@
 
     $(document).ready(function () {
 
-      console.log(baseUrl);
+      // console.log(baseUrl);
 
       // If dates are not found in local storage, set default values (now and now - 1 hour)
       if (!startDate || !endDate) {
@@ -189,142 +191,199 @@
       let formattedStartTime = encodeURIComponent(s) + '%3A00';
       let formattedEndTime = encodeURIComponent(e) + '%3A00';
 
-      var url_ = ''
+      var url_ = '';
       if (camera_id != 0) {
-        url_ = url_get + '&start_time=' + formattedStartTime + '&end_time=' + formattedEndTime + '&camera_id=' + (camera_id).trim()
+        url_ = url_get + '&start_time=' + formattedStartTime + '&end_time=' + formattedEndTime + '&camera_id=' + (camera_id).trim();
       } else {
         url_ = url_get + '&start_time=' + formattedStartTime + '&end_time=' + formattedEndTime;
       }
 
-      $.ajax({
-        url: url_,
-        method: 'GET',
-        success: function (data) {
-          data.forEach(function (item) {
-            var formattedDate = moment(item.timestamp).format('YYYY-MM-DD HH:mm:ss');
-            var candidatePlate = '';
-            var candidateBrand = '';
-
-            // Loop through item.candidates array to create HTML for each candidate
-            item.candidates.slice(0, 4).forEach(function (candidate) {
-              candidatePlate += '<span>' + candidate.plate + '<span style="font-size:12px">(' + (candidate.score * 100).toFixed(1) + ')</span>' + '</span><br>';
-            });
-
-            item.vehicle_brand.slice(0, 4).forEach(function (candidate) {
-              candidateBrand += '<span>' + candidate.make + '<span style="font-size:12px">(' + (candidate.score * 100).toFixed(1) + ')</span>' + '</span><br>';
-            });
-
-
-            $('#example tbody').append('<tr>' +
-              '<td><input type="checkbox" class="delete-checkbox" value="' + item._id + '"></td>' +
-              '<td>' + item._id + '<br>' + formattedDate + '<br><b>' + item.camera_id + '</b></td><td>' + item.vehicle_type + '</td>' +
-              '<td style="background-color: #FFEEFC;" contenteditable="true" class="vehicle-type">' + item.vehicle_type + '</td>' +
-              '<td align="center"><img class="zoom-image" src="' + item.image_url_plate + '" alt="Plate Image" style="width: 100px; cursor: pointer;"></td>' +
-              '<td>' + candidatePlate + '</td>' + // Insert the candidateHtml here
-              '<td style="background-color: #FFEEFC;" contenteditable="true" class="plate-number">' + item.plate_number + '</td>' +
-              '<td style="background-color: #FFEEFC;" contenteditable="true" class="plate-state">' + item.plate_state.name + '</td>' +
-              '<td align="center"><img class="zoom-image" src="' + item.image_url + '" alt="Plate Image" style="width: 100px; cursor: pointer;"></td>' +
-              '<td>' + candidateBrand + '</td>' + // Insert the candidateHtml here
-              '<td style="background-color: #FFEEFC;" contenteditable="true" class="plate-brand">' + item.vehicle_brand[0].make + '</td>' +
-              '<td><button class="btn btn-primary btn-update">Update</button></td>' +
-              '</tr>');
-          });
-
-          // var dataTable = $('#example').DataTable({
-          //   "columnDefs": [{
-          //     "targets": 0,
-          //     "orderable": false,
-          //     "searchable": false
-          //   }],
-          //   "order": [
-          //     [2, 'desc']
-          //   ]
-          // });
-
-          $('#example tbody').on('click', '.zoom-image', function () {
-            openImageModal($(this).attr('src'));
-          });
-
-          // Update functionality
-          $('#example tbody').on('click', '.btn-update', function () {
-            var rowData = $(this).closest('tr');
-            var rowIndex = rowData.index();
-            var editedPlateNumber = rowData.find('.plate-number').text();
-            var editedVehicleType= rowData.find('.vehicle-type').text();
-            var editedPlateState = rowData.find('.plate-state').text();
-            var editedVehicleBrand = rowData.find('.plate-brand').text();
-            data[rowIndex].plate_number = editedPlateNumber;
-            data[rowIndex].candidates[0].plate = editedPlateNumber;
-            data[rowIndex].vehicle_brand[0].make = editedVehicleBrand;
-            data[rowIndex].plate_state.name = editedPlateState;
-            data[rowIndex].vehicle_type = editedVehicleType;
-            var dataUpdate = {
-              "plate_state": data[rowIndex].plate_state,
-              "plate_number": data[rowIndex].plate_number,
-              "candidates": data[rowIndex].candidates,
-              "vehicle_brand": data[rowIndex].vehicle_brand,
-              "vehicle_type" : data[rowIndex].vehicle_type
-            };
-
-            // console.log(url_update + data[rowIndex]._id);
-            // console.log(dataUpdate);
-            // return
-
-            // Send updated data to the API
-            $.ajax({
-              url: url_update + data[rowIndex]._id, // Replace with the actual URL of your API
-              method: 'PUT', // Use the appropriate HTTP method (PUT, POST, etc.)
-              contentType: 'application/json',
-              data: JSON.stringify(dataUpdate),
-              success: function (response) {
-                showToast("Data updated successfully", "success");
-                // setTimeout(function () {
-                //   window.location.reload();
-                // }, 1000);
+      const dumpData = {
+        "data": [
+          {
+            "_id": 1714672195834375,
+            "event_name": "Test",
+            "cam_id": "กล้องทดสอบ-ขาเข้า-1",
+            "obj_id": "1714672193809990_box_x7gnnd",
+            "obj_data": [
+              {
+                "obj_no": 1,
+                "cls_name": "box",
+                "box": [
+                  1365,
+                  708,
+                  1503,
+                  779
+                ],
+                "centroid": [
+                  1434,
+                  743
+                ],
+                "conf": 0.5504499673843384
               },
-              error: function (error) {
-                showToast("ไม่พบข้อมูล หรืออินเทอร์เน็ตมีปัญหา", "error");
-                // setTimeout(function () {
-                //   window.location.reload();
-                // }, 1000);
-                // console.error('Error updating data:', error);
+              {
+                "obj_no": 1,
+                "cls_name": "bag",
+                "box": [
+                  1365,
+                  708,
+                  1503,
+                  779
+                ],
+                "centroid": [
+                  1434,
+                  743
+                ],
+                "conf": 0.5504499673843384
               }
-            });
+            ],
+            "img_in_url": [
+              "89.213.177.157:9001/lpr-ai-picture/detected_left_object/1714672195834375_0_obj.jpg"
+            ],
+            "img_out_url": [],
+            "found_at": "2024-05-03 00:49:53",
+            "create_at": "2024-05-03 00:49:55",
+            "update_at": "-"
+          }
+        ]
+      }
+      const classNames = ["person", "motorbike", "car", "motorbike", "N/A",
+        "train", "traffic light", "fire hydrant", "stop sign", "parking meter", "bench",
+        "cat", "dog", "umbrella", "bag", "suitcase", "bowl",
+        "snowboard", "sports ball", "knife", "baseball bat",
+        "baseball glove", "skateboard", "surfboard", "tennis racket", "bottle",
+        "wine glass", "cup", "bowl", "banana", "apple", "sandwich", "orange",
+        "broccoli", "carrot", "hot dog", "pizza", "donut",
+        "cake", "chair", "sofa", "pottedplant", "bed",
+        "diningtable", "mouse", "remote", "keyboard", "cell phone", "sink", "clock",
+        "vase", "scissors", "teddy bear", "gun", "box"];
+
+      dumpData.data.forEach(function (item) {
+        // console.log(item)
+        var formattedDate = moment(item.create_at).format('YYYY-MM-DD HH:mm:ss');
+        var obj_class = '';
+
+        item.obj_data.forEach(function (obj_data_item, index) {
+          // Append each obj_data_item.cls_name and select tag inside a container
+          obj_class += '<div class="obj-container">';
+          obj_class += '<span>' + obj_data_item.cls_name + '</span>' + ': ' + '<select>';
+          classNames.forEach(function (className) {
+            obj_class += '<option value="' + className + '"' + (className === obj_data_item.cls_name ? ' selected' : '') + '>' + className + '</option>';
           });
-        },
-        error: function (error) {
-          showToast("ไม่พบข้อมูล หรืออินเทอร์เน็ตมีปัญหา", "error");
-          // console.error('Error fetching data:', error);
+          obj_class += '</select><button class="delete-btn btn btn-secondary btn-sm" data-index="' + index + '">x</button></div><br>';
+        });
+
+        $('#example tbody').append('<tr>' +
+          '<td><input type="checkbox" class="delete-checkbox" value="' + item._id + '"></td>' +
+          '<td>' + item._id + '<br>' + formattedDate + '<br><b>' + item.camera_id + '</b></td>' +
+          '<td align="center"><img class="zoom-image" src="' + item.image_url_plate + '" alt="Plate Image" style="width: 100px; cursor: pointer;"></td>' +
+          '<td style="background-color: #FFEEFC;">' + 'ประเภทวัตถุที่ตรวจจับได้ :<br><button class="add-new-btn btn btn-primary">Add New</button><br>' + obj_class + '</td>' +
+          '<td style="background-color: #FFEEFC;"><button class="save-btn btn btn-primary">Save</button></td>' +
+          '</tr>');
+      });
+
+      $('tbody').on('change', 'select', function () {
+        var selectedOption = $(this).val(); // Get the selected value
+        var rowIndex = $(this).closest('tr').index(); // Get the index of the row
+        var index = $(this).closest('td').find('.obj-container').index($(this).closest('.obj-container')); // Get the index of the obj-container within the row
+        console.log(index)
+        // Ensure obj_data exists and has enough elements
+        if (dumpData.data[rowIndex].obj_data && index < dumpData.data[rowIndex].obj_data.length) {
+          dumpData.data[rowIndex].obj_data[index].cls_name = selectedOption; // Update the data object
+        } else {
+          console.error('Object data or index is undefined.');
         }
       });
-    }
-
-    function openImageModal(imageUrl) {
-      Swal.fire({
-        imageUrl: imageUrl,
-        imageAlt: 'Plate Image',
-        showCloseButton: true,
-        showConfirmButton: false,
-        imageWidth: 400,
-        imageHeight: 300,
-        customClass: {
-          image: 'image-zoom',
-        },
-        html: '<div class="zoom-controls">' +
-          '<button class="zoom-btn zoom-in">Zoom In</button>' +
-          '<button class="zoom-btn zoom-out">Zoom Out</button>' +
-          '</div>',
-        didOpen: () => {
-          $('.swal2-image').css('max-width', '100%');
-        }
+      $('tbody').on('click', '.save-btn', function () {
+        var rowIndex = $(this).closest('tr').index(); // Get the index of the row
+        var rowData = dumpData.data[rowIndex]; // Get the corresponding data object
+        console.log(rowData); // Log the data object
       });
 
-      $('.zoom-in').click(function () {
-        $('.swal2-image').css('transform', 'scale(1.2)');
+      // Event listener for the "Add New" button
+      $('tbody').on('click', '.add-new-btn', function () {
+        var index = $(this).data('index');
+        var itemIndex = $(this).closest('tr').index();
+        var newRow = $('<tr>');
+
+        // Create a new obj_data entry
+        var newObjData = {
+          "obj_no": 1, // Set appropriate values for obj_no and other properties
+          "cls_name": "",
+          "box": [0, 0, 0, 0],
+          "centroid": [0, 0],
+          "conf": 0
+        };
+        dumpData.data[itemIndex].obj_data.push(newObjData);
+        // Append the new object to the table
+        var obj_class = '<div class="obj-container">';
+        obj_class += '<span>New</span>' + ': ' + '<select select class="cls-name-select">';
+        classNames.forEach(function (className) {
+          obj_class += '<option value="' + className + '"' + (className === newObjData.cls_name ? ' selected' : '') + '>' + className + '</option>';
+        });
+        obj_class += '</select><button class="delete-btn btn btn-secondary btn-sm" data-index="' + (dumpData.data[itemIndex].obj_data.length - 1) + '">x</button></div><br>';
+
+        $(this).closest('tr').find('td:eq(2)').append(obj_class);
       });
 
-      $('.zoom-out').click(function () {
-        $('.swal2-image').css('transform', 'scale(1)');
+      $('#example tbody').on('click', '.zoom-image', function () {
+        openImageModal($(this).attr('src'));
+      });
+
+      function openImageModal(imageUrl) {
+        Swal.fire({
+          imageUrl: imageUrl,
+          imageAlt: 'Plate Image',
+          showCloseButton: true,
+          showConfirmButton: false,
+          imageWidth: 400,
+          imageHeight: 300,
+          customClass: {
+            image: 'image-zoom',
+          },
+          html: '<div class="zoom-controls">' +
+            '<button class="zoom-btn zoom-in">Zoom In</button>' +
+            '<button class="zoom-btn zoom-out">Zoom Out</button>' +
+            '</div>',
+          didOpen: () => {
+            $('.swal2-image').css('max-width', '100%');
+          }
+        });
+
+        $('.zoom-in').click(function () {
+          $('.swal2-image').css('transform', 'scale(1.2)');
+        });
+
+        $('.zoom-out').click(function () {
+          $('.swal2-image').css('transform', 'scale(1)');
+        });
+      }
+
+      // Delegate event listener for the delete buttons
+      $('tbody').on('click', '.delete-btn', function () {
+        var index = $(this).data('index');
+        var itemIndex = $(this).closest('tr').index();
+
+        // Remove item.obj_data corresponding to the clicked button
+        dumpData.data[itemIndex].obj_data.splice(index, 1);
+
+        // Remove the container associated with the clicked "x" button
+        $(this).closest('.obj-container').remove();
+      });
+
+
+      // Add event listener to delete buttons
+      $('.delete-btn').on('click', function () {
+        var index = $(this).data('index');
+        var itemIndex = $(this).closest('tr').index();
+
+        // Remove item.obj_data corresponding to the clicked button
+        dumpData.data[itemIndex].obj_data.splice(index, 1);
+
+        // Hide the select element associated with the clicked "x" button
+        $(this).parent('.obj-container').hide();
+        // Hide the clicked "x" button
+        $(this).hide();
       });
     }
 
@@ -361,6 +420,7 @@
     });
 
     function del(select) {
+      console.log(select)
       if (select.length > 0) {
         // Loop through each selected ID
         select.forEach(function (id) {
