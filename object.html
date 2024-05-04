@@ -46,7 +46,7 @@
     </div>
   </nav>
   <div style="padding: 2%;">
-    <h3>CAMERA / restrict-target</h3>
+    <h3>Target Area Detection -พื้นที่เฝ้าระวัง</h3>
     <hr>
     <form id="myForm">
       <div class="row">
@@ -69,8 +69,6 @@
               <option value="0">ทั้งหมด</option>
               <option value="กล้องทดสอบ-ขาเข้า-1">กล้องทดสอบ-ขาเข้า-1</option>
               <option value="กล้องทดสอบ-ขาเข้า-2">กล้องทดสอบ-ขาเข้า-2</option>
-              <option value="กล้องทดสอบ-ขาออก-1">กล้องทดสอบ-ขาออก-1</option>
-              <option value="กล้องทดสอบ-ขาออก-2">กล้องทดสอบ-ขาออก-2</option>
             </select>
           </div>
         </div>
@@ -134,6 +132,7 @@
     baseUrl = localStorage.getItem("storedURL") ? localStorage.getItem("storedURL") : baseUrl;
 
     var dumpData = [];
+    var now = new Date();
 
     $(document).ready(function () {
 
@@ -141,7 +140,6 @@
 
       // If dates are not found in local storage, set default values (now and now - 1 hour)
       if (!startDate || !endDate) {
-        var now = new Date();
 
         // Adjust time by subtracting 1 hour in Thai time zone
         var th_now = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Bangkok' }));
@@ -189,16 +187,14 @@
       $('#example tbody').empty();
       var camera_id = document.getElementById('camera_id').value;
       // Format the start time and end time strings
-      let formattedStartTime = encodeURIComponent(s) + '%3A00';
-      let formattedEndTime = encodeURIComponent(e) + '%3A00';
+      const s_d = moment().subtract(1, 'hours').format('YYYY-MM-DD HH:mm:ss');
+      const e_d = moment().format('YYYY-MM-DD HH:mm:ss');
 
-      // var url_ = '';
-      // if (camera_id != 0) {
-      //   url_ = url_get + '&start_time=' + formattedStartTime + '&end_time=' + formattedEndTime + '&camera_id=' + (camera_id).trim();
-      // } else {
-      //   url_ = url_get + '&start_time=' + formattedStartTime + '&end_time=' + formattedEndTime;
-      // }
-
+      console.log(JSON.stringify({
+        "created_at_from": s_d,
+        "created_at_to": e_d,
+        "cam_id": camera_id == 0 ? null : camera_id,
+      }))
       $.ajax({
         url: url_get,
         method: 'POST',
@@ -206,8 +202,13 @@
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
-        data: JSON.stringify({}),
+        data: JSON.stringify({
+          "created_at_from": s_d,
+          "created_at_to": e_d,
+          "cam_id": camera_id == 0 ? null : camera_id,
+        }),
         success: function (dumpData) {
+          console.log(dumpData)
           const classNames = ["person", "motorbike", "car", "motorbike", "N/A",
             "train", "traffic light", "fire hydrant", "stop sign", "parking meter", "bench",
             "cat", "dog", "umbrella", "bag", "suitcase", "bowl",
@@ -236,7 +237,7 @@
 
             $('#example tbody').append('<tr>' +
               '<td><input type="checkbox" class="delete-checkbox" value="' + item._id + '"></td>' +
-              '<td>' + item._id + '<br>' + formattedDate + '<br><b>' + item.camera_id + '</b></td>' +
+              '<td>' + item._id + '<br>' + formattedDate + '<br><b>' + item.cam_id + '</b></td>' +
               '<td align="center"><img class="zoom-image" src="http://' + item.img_in_url[0] + '" alt="Image In" style="width: 300px; cursor: pointer;"></td>' +
               '<td style="background-color: #FFEEFC;">' + 'ประเภทวัตถุที่ตรวจจับได้ :<br><button class="add-new-btn btn btn-primary">Add New</button><br>' + obj_class + '</td>' +
               '<td style="background-color: #FFEEFC;"><button class="save-btn btn btn-primary">Save</button></td>' +
