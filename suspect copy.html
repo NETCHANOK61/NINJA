@@ -36,17 +36,17 @@
         <li class="nav-item">
           <a class="nav-link" href="index.html">ตั้งค่า</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="suspect.html">Suspect</a>
-        </li>
         <li class="nav-item active">
-          <a class="nav-link" href="object.html">Object <span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="suspect.html">Suspect <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="object.html">Object</a>
         </li>
       </ul>
     </div>
   </nav>
   <div style="padding: 2%;">
-    <h3>Target Area Detection -พื้นที่เฝ้าระวัง</h3>
+    <h3>Suspect Searching -ค้นหาคนและเสื้อผ้า</h3>
     <hr>
     <form id="myForm">
       <div class="row">
@@ -122,8 +122,8 @@
     // var baseUrl = 'http://49.0.82.233'; 
     var baseUrl = 'http://192.168.8.123';
     baseUrl = localStorage.getItem("storedURL") ? localStorage.getItem("storedURL") : baseUrl;
-    var url_get = baseUrl + ':8003/detected-restrict-object/list';
-    var url_update = baseUrl + ':8003/detected-restrict-object/';
+    var url_get = baseUrl + ':8003/gender_aware_result/list';
+    var url_update = baseUrl + ':8003/gender_aware_result/';
     var url_cameras_all = baseUrl + ':8002/cameras/all'
 
     // Check local storage for previously selected dates
@@ -190,11 +190,6 @@
       const s_d = moment().subtract(1, 'hours').format('YYYY-MM-DD HH:mm:ss');
       const e_d = moment().format('YYYY-MM-DD HH:mm:ss');
 
-      // console.log(JSON.stringify({
-      //   "created_at_from": s_d,
-      //   "created_at_to": e_d,
-      //   "cam_id": camera_id == 0 ? null : camera_id,
-      // }))
       $.ajax({
         url: url_get,
         method: 'POST',
@@ -203,62 +198,89 @@
           'Content-Type': 'application/json'
         },
         data: JSON.stringify({
-          "created_at_from": s_d,
-          "created_at_to": e_d,
           "cam_id": camera_id == 0 ? null : camera_id,
         }),
         success: function (dumpData) {
-          console.log(dumpData)
-          const classNames = ["person", "motorbike", "car", "motorbike", "N/A",
-            "train", "traffic light", "fire hydrant", "stop sign", "parking meter", "bench",
-            "cat", "dog", "umbrella", "bag", "suitcase", "bowl",
-            "snowboard", "sports ball", "knife", "baseball bat",
-            "baseball glove", "skateboard", "surfboard", "tennis racket", "bottle",
-            "wine glass", "cup", "bowl", "banana", "apple", "sandwich", "orange",
-            "broccoli", "carrot", "hot dog", "pizza", "donut",
-            "cake", "chair", "sofa", "pottedplant", "bed",
-            "diningtable", "mouse", "remote", "keyboard", "cell phone", "sink", "clock",
-            "vase", "scissors", "teddy bear", "gun", "box"];
+          const classNames = ["กระเป๋า", "เข็มขัด", "บู๊ต", "รองเท้า", "เสื้อคลุม", "ชุดเดรส", "แว่นตากันแดด", "กางเกง", "เสื้อ", "กางเกงขาสั้น", "กระโปรง", "หมวก", "เครื่องประดับคอ"];
+          const color = [{ text: 'ขาว', value: '#E8E8E8' },
+          { text: 'แดง', value: '#ff0000' },
+          { text: 'น้ำเงิน', value: '#0000ff' },
+          { text: 'เหลือง', value: '#ffff00' },
+          { text: 'ดำ', value: '#000000' },
+          { text: 'ส้ม', value: '#ffa500' },
+          { text: 'เขียว', value: '#008000' },
+          { text: 'ม่วง', value: '#800080' },
+          { text: 'เทา', value: '#808080' },
+          { text: 'ชมพู', value: '#ffc0cb' },
+          { text: 'น้ำตาล', value: '#a52a2a' },]
 
           dumpData.data.forEach(function (item) {
-            // console.log(item)
             var formattedDate = moment(item.create_at).format('YYYY-MM-DD HH:mm:ss');
             var obj_class = '';
 
-            item.obj_data.forEach(function (obj_data_item, index) {
-              // Append each obj_data_item.cls_name and select tag inside a container
+            item.clothing.forEach(function (clothing_item, index) {
               obj_class += '<div class="obj-container">';
-              obj_class += '<span>' + obj_data_item.cls_name + '</span>' + ': ' + '<select>';
+              obj_class += '<span>' + clothing_item.type + '</span>' + ': ' + '<select class="clothing-type">';
               classNames.forEach(function (className) {
-                obj_class += '<option value="' + className + '"' + (className === obj_data_item.cls_name ? ' selected' : '') + '>' + className + '</option>';
+                obj_class += '<option value="' + className + '"' + (className === clothing_item.type ? ' selected' : '') + '>' + className + '</option>';
               });
-              obj_class += '</select><button class="delete-btn btn btn-secondary btn-sm" data-index="' + index + '">x</button></div><br>';
+              obj_class += '</select>';
+
+              // Add color select dropdown
+              if (clothing_item.color.length > 0) {
+                var a = clothing_item.color.length > 0 ? clothing_item.color[0].value : ''
+                obj_class += '<select class="color-select">';
+                color.forEach(function (colorOption) {
+                  obj_class += '<option value="' + colorOption.text + '"' + (colorOption.text === a ? ' selected' : '') + '>' + colorOption.text + '</option>';
+                });
+                obj_class += '</select>';
+              }
+
+              obj_class += '<button class="delete-btn btn btn-secondary btn-sm" data-index="' + index + '">x</button></div><br>';
             });
 
             $('#example tbody').append('<tr>' +
               '<td><input type="checkbox" class="delete-checkbox" value="' + item._id + '"></td>' +
-              '<td>' + item._id + '<br>' + formattedDate + '<br><b>' + item.cam_id + '</b></td>' +
-              '<td align="center"><img class="zoom-image" src="http://' + item.img_in_url[0] + '" alt="Image In" style="width: 300px; cursor: pointer;"></td>' +
-              '<td style="background-color: #FFEEFC;">' + 'ประเภทวัตถุที่ตรวจจับได้ :<br><button class="add-new-btn btn btn-primary">Add New</button><br>' + obj_class + '</td>' +
+              '<td>' + item._id + '<br>' + formattedDate + '<br><b>' + item.camera_id + '</b></td>' +
+              '<td align="center"><img class="zoom-image" src="http://' + item.pic_url + '" alt="Image In" style="width: 300px; cursor: pointer;"></td>' +
+              '<td style="background-color: #FFEEFC;">' + 'เครื่องแต่งกาย :<br><button class="add-new-btn btn btn-primary">Add New</button><br>' + obj_class + '</td>' +
               '<td style="background-color: #FFEEFC;"><button class="save-btn btn btn-primary">Save</button></td>' +
               '</tr>');
           });
 
-          $('tbody').on('change', 'select', function () {
-            var selectedOption = $(this).val(); // Get the selected value
-            var rowIndex = $(this).closest('tr').index(); // Get the index of the row
-            var index = $(this).closest('td').find('.obj-container').index($(this).closest('.obj-container')); // Get the index of the obj-container within the row
-            // console.log(index)
-            // Ensure obj_data exists and has enough elements
-            if (dumpData.data[rowIndex].obj_data && index < dumpData.data[rowIndex].obj_data.length) {
-              dumpData.data[rowIndex].obj_data[index].cls_name = selectedOption; // Update the data object
-            } else {
-              console.error('Object data or index is undefined.');
+          // Event handler for clothing type change
+          $('tbody').on('change', 'select.clothing-type', function () {
+            var rowIndex = $(this).closest('tr').index();
+            var index = $(this).closest('.obj-container').index();
+            var selectedOption = $(this).val();
+            var item = dumpData[rowIndex];
+            if (item && item.clothing && item.clothing[index]) {
+              item.clothing[index].type = selectedOption;
             }
           });
+
+          // Event handler for color change
+          $('tbody').on('change', 'select.color-select', function () {
+            console.log("Color changed");
+            var $container = $(this).closest('.obj-container');
+            var rowIndex = $container.closest('tr').index();
+            var index = $container.index();
+            var selectedColor = $(this).val();
+            var item = dumpData[rowIndex];
+            console.log("Before modification:", item);
+            if (item && item.clothing && item.clothing[index] && item.clothing[index].color) {
+              item.clothing[index].color[0].value = selectedColor;
+            }
+            console.log("After modification:", item);
+            // Update the displayed color
+            $container.find('.color-text').text(selectedColor);
+          });
+
           $('tbody').on('click', '.save-btn', function () {
             var rowIndex = $(this).closest('tr').index(); // Get the index of the row
             var rowData = dumpData.data[rowIndex]; // Get the corresponding data object
+            console.log(rowData);
+            return
             $.ajax({
               url: url_update + rowData._id, // Replace with the actual URL of your API
               method: 'PUT', // Use the appropriate HTTP method (PUT, POST, etc.)
@@ -280,95 +302,9 @@
             });
           });
 
-          // Event listener for the "Add New" button
-          $('tbody').on('click', '.add-new-btn', function () {
-            var index = $(this).data('index');
-            var itemIndex = $(this).closest('tr').index();
-            var newRow = $('<tr>');
-
-            // Create a new obj_data entry
-            var newObjData = {
-              "obj_no": 1, // Set appropriate values for obj_no and other properties
-              "cls_name": "N/A",
-              "box": [0, 0, 0, 0],
-              "centroid": [0, 0],
-              "conf": 0
-            };
-            dumpData.data[itemIndex].obj_data.push(newObjData);
-            // Append the new object to the table
-            var obj_class = '<div class="obj-container">';
-            obj_class += '<span>New</span>' + ': ' + '<select select class="cls-name-select">';
-            classNames.forEach(function (className) {
-              obj_class += '<option value="' + className + '"' + (className === newObjData.cls_name ? ' selected' : '') + '>' + className + '</option>';
-            });
-            obj_class += '</select><button class="delete-btn btn btn-secondary btn-sm" data-index="' + (dumpData.data[itemIndex].obj_data.length - 1) + '">x</button></div><br>';
-
-            $(this).closest('tr').find('td:eq(3)').append(obj_class);
-          });
-
-          $('#example tbody').on('click', '.zoom-image', function () {
-            openImageModal($(this).attr('src'));
-          });
-
-          function openImageModal(imageUrl) {
-            Swal.fire({
-              imageUrl: imageUrl,
-              imageAlt: 'Plate Image',
-              showCloseButton: true,
-              showConfirmButton: false,
-              imageWidth: 400,
-              imageHeight: 300,
-              customClass: {
-                image: 'image-zoom',
-              },
-              html: '<div class="zoom-controls">' +
-                '<button class="zoom-btn zoom-in">Zoom In</button>' +
-                '<button class="zoom-btn zoom-out">Zoom Out</button>' +
-                '</div>',
-              didOpen: () => {
-                $('.swal2-image').css('max-width', '100%');
-              }
-            });
-
-            $('.zoom-in').click(function () {
-              $('.swal2-image').css('transform', 'scale(1.2)');
-            });
-
-            $('.zoom-out').click(function () {
-              $('.swal2-image').css('transform', 'scale(1)');
-            });
-          }
-
-          // Delegate event listener for the delete buttons
-          $('tbody').on('click', '.delete-btn', function () {
-            var index = $(this).data('index');
-            var itemIndex = $(this).closest('tr').index();
-
-            // Remove item.obj_data corresponding to the clicked button
-            dumpData.data[itemIndex].obj_data.splice(index, 1);
-
-            // Remove the container associated with the clicked "x" button
-            $(this).closest('.obj-container').remove();
-          });
-
-
-          // Add event listener to delete buttons
-          $('.delete-btn').on('click', function () {
-            var index = $(this).data('index');
-            var itemIndex = $(this).closest('tr').index();
-
-            // Remove item.obj_data corresponding to the clicked button
-            dumpData.data[itemIndex].obj_data.splice(index, 1);
-
-            // Hide the select element associated with the clicked "x" button
-            $(this).parent('.obj-container').hide();
-            // Hide the clicked "x" button
-            $(this).hide();
-          });
         },
         error: function (error) {
           showToast("ไม่พบข้อมูล หรืออินเทอร์เน็ตมีปัญหา", "error");
-          // console.error('Error fetching data:', error);
         }
       });
     }
@@ -406,7 +342,6 @@
     });
 
     function del(select) {
-      console.log(select)
       if (select.length > 0) {
         // Loop through each selected ID
         select.forEach(function (id) {
@@ -421,7 +356,7 @@
             },
             error: function (error) {
               showToast("Error deleting data", "error");
-              console.error('Error deleting data:', error);
+              // console.error('Error deleting data:', error);
             },
             complete: function () {
               // Check if all deletions have been processed before reloading
