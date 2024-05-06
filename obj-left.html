@@ -40,7 +40,13 @@
           <a class="nav-link" href="suspect.html">Suspect</a>
         </li>
         <li class="nav-item active">
-          <a class="nav-link" href="object.html">Object <span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="obj-left.html">วัตถุทิ้งไว้<span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="obj-lost.html">วัตถุหายไป</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="obj-target.html">Target-area-พื้นที่เสี่ยง</a>
         </li>
       </ul>
     </div>
@@ -67,7 +73,7 @@
             <label for="CameraSelect">กล้อง:</label>
             <select class="form-control" id="camera_id">
               <option value="0">ทั้งหมด</option>
-              <option value="กล้องทดสอบ-ขาเข้า-1">กล้องทดสอบ-ขาเข้า-1</option>
+              <option value="กล้องทดสอบ-ขาเข้า-1"></option>
               <option value="กล้องทดสอบ-ขาเข้า-2">กล้องทดสอบ-ขาเข้า-2</option>
             </select>
           </div>
@@ -122,8 +128,8 @@
     // var baseUrl = 'http://49.0.82.233'; 
     var baseUrl = 'http://192.168.8.123';
     baseUrl = localStorage.getItem("storedURL") ? localStorage.getItem("storedURL") : baseUrl;
-    var url_get = baseUrl + ':8003/detected-restrict-object/list';
-    var url_update = baseUrl + ':8003/detected-restrict-object/';
+    var url_get = baseUrl + ':8003/detected-left-object/list';
+    var url_update = baseUrl + ':8003/detected-left-object/';
     var url_cameras_all = baseUrl + ':8002/cameras/all'
 
     // Check local storage for previously selected dates
